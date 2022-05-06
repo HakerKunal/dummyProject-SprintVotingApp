@@ -56,14 +56,14 @@ class Login(APIView):
                     {
                         "message": "Login Unsuccessful username or password incorrect"
                     },
-                    status=status.HTTP_200_OK)
+                    status=status.HTTP_404_NOT_FOUND)
             return Response(
                 {
                     "message": "Login Successful"
                 },
                 status=status.HTTP_200_OK)
 
-        except ValidationError as e:
+        except Exception as e:
             return Response(
                 {
                     "message": "Authentication Fail",
