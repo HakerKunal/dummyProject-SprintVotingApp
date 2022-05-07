@@ -3,12 +3,15 @@ from .models import User
 
 
 class UserSerializer(serializers.Serializer):
+    """
+    User Serializer request and create new user
+    """
     id = serializers.IntegerField(required=False)
     username = serializers.CharField(allow_blank=False, allow_null=False, required=True)
     email = serializers.CharField(required=False)
     first_name = serializers.CharField(required=False)
     last_name = serializers.CharField(required=False)
-    password = serializers.CharField(required=True, allow_null=False, allow_blank=False)
+    password = serializers.CharField(max_length=128, min_length=8, required=True, allow_null=False, allow_blank=False)
     is_verified = serializers.BooleanField(default=False)
 
     def create(self, validated_data):

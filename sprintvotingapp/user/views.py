@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.exceptions import ValidationError
 from .serializers import UserSerializer
+from .utils import EncodeDecodeToken
 
 logging.basicConfig(filename="user.log", filemode="w")
 
@@ -19,7 +20,8 @@ class Registration(APIView):
         try:
             serializer = UserSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
-            serializer.create(validated_data=serializer.data)
+            user = serializer.create(validated_data=serializer.data)
+            token = EncodeDecodeToken.encode_token(user.id)
 
             return Response({"message": "User Registration Successful"}, status=status.HTTP_201_CREATED)
         except IntegrityError as e:
@@ -63,7 +65,7 @@ class Login(APIView):
                 },
                 status=status.HTTP_200_OK)
 
-        except Exception as e:
+        except ValidationError as e:
             return Response(
                 {
                     "message": "Authentication Fail",
