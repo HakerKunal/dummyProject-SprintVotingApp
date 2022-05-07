@@ -7,8 +7,8 @@ class UserSerializer(serializers.Serializer):
     User Serializer request and create new user
     """
     id = serializers.IntegerField(required=False)
-    username = serializers.CharField(allow_blank=False, allow_null=False, required=True)
-    email = serializers.CharField(required=False)
+    username = serializers.RegexField("^(?=.{6,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$")
+    email = serializers.EmailField()
     first_name = serializers.CharField(required=False)
     last_name = serializers.CharField(required=False)
     password = serializers.CharField(max_length=128, min_length=8, required=True, allow_null=False, allow_blank=False)
@@ -36,3 +36,8 @@ class UserSerializer(serializers.Serializer):
         instance.is_verified = validated_data.get('is_verified', instance.is_verified)
         instance.save()
         return instance
+
+    def validate_username(self, value):
+        if User.objects.filter(username=value).exists():
+            raise serializers.ValidationError("A user with this username already exists!")
+        return value
