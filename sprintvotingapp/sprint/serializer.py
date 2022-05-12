@@ -1,11 +1,11 @@
 from rest_framework import serializers
 from .utils import InsertionError
-from .models import Sprint
+from .models import Sprint, Parameter
 
 
 class SprintSerializer(serializers.Serializer):
     """
-    Serializer is used to converting the python object for the Sprint
+   Serializer for Converting Python object for  Parameter Table
     """
     id = serializers.IntegerField(required=False)
     sprint_name = serializers.CharField(required=False)
@@ -40,5 +40,24 @@ class SprintSerializer(serializers.Serializer):
         instance.end_date = validated_data.get('end_date', instance.end_date)
         instance.is_active = validated_data.get('is_active', instance.is_active)
 
+        instance.save()
+        return instance
+
+
+class ParamSerializer(serializers.Serializer):
+    """
+    Serializer for Converting Python object for  Parameter Table
+    """
+    id = serializers.IntegerField(required=False)
+    parameter_name = serializers.CharField(required=True)
+
+    def create(self, validate_data):
+        parameter = Parameter.objects.create(
+            parameter_name=validate_data.get("parameter_name")
+        )
+        return parameter
+
+    def update(self, instance, validated_data):
+        instance.parameter_name = validated_data.get('parameter_name', instance.parameter_name)
         instance.save()
         return instance
