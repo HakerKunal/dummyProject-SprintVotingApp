@@ -1,9 +1,9 @@
 import logging
-from .models import Sprint, Parameter
+from .models import Sprint, Parameter, Votes
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializer import SprintSerializer, ParamSerializer
+from .serializer import SprintSerializer, ParamSerializer, VoteSerializer
 from rest_framework.exceptions import ValidationError
 from .utils import InsertionError, verify_token
 
@@ -217,8 +217,9 @@ class VoteParameter(APIView):
                     "error": str(e)
                 }
             )
+
     @verify_token
-    def delete(self,request, id):
+    def delete(self, request, id):
         """
         For Delete The Existing Parameter
         :param id:id of the parameter you want to delete
@@ -245,4 +246,102 @@ class VoteParameter(APIView):
                     "message": "Exception Occurred",
                     "error": str(e)
                 }, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class Voting(APIView):
+    @verify_token
+    def post(self, request, id):
+        try:
+
+            request.data.update({"sprint_id": id})
+            request.data.update({"vote_by": request.data.get("user_id")})
+            vote = Votes.objects.filter(vote_by=request.data.get('vote_by'),
+                                        parameter_id=request.data.get('parameter_id'), sprint_id=id)
+            print(vote)
+            if not Sprint.objects.filter(id=id, is_active=True):
+                return Response(
+                    {
+                        "message": "this Sprint is not active"
+                    }
+                )
+
+            if request.data.get("vote_by") == request.data.get("vote_to"):
+                return Response(
+                    {
+                        "message": "You cannot Vote for yourself"
+                    }
+                )
+            elif vote:
+                return Response(
+                    {
+                        "message": "You have already voted on this parameter"
+                    }
+                )
+
+            serializer = VoteSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+
+            return Response(
+                {
+                    "message": "Voting Successful"
+                }, status=status.HTTP_201_CREATED
+            )
+
+        except Exception as e:
+            logging.error(e)
+            return Response(
+                {
+                    "message": "Exception Occurred",
+                    "error": str(e)
+                }, status=status.HTTP_400_BAD_REQUEST
+            )
+
+    @verify_token
+    def get(self, request, id):
+        """
+        For getting the details of vote done by a user
+        :param request:
+        :param id: User id of how is login
+        :return: Response
+        """
+        try:
+
+            votes = Votes.objects.filter(vote_by=request.data.get("user_id"), sprint_id=id)
+            serializer = VoteSerializer(votes, many=True)
+            vote_list = list()
+            if serializer.data:
+                for vote in serializer.data:
+                    vote_list.append({"parameter_id": vote.get("parameter_id"), "vote_to": vote.get("vote_to")})
+                vote_data = {
+                    "Vote_by": request.data.get("user_id"),
+                    "sprint_id": id,
+                    "vote_details": vote_list
+                }
+                return Response(
+                    {
+                        "message": "Here is your data",
+                        "data": vote_data
+                    }, status=status.HTTP_200_OK
+                )
+            return Response(
+                {
+                    "message": "He has Not vote for any parameter",
+
+                }, status=status.HTTP_404_NOT_FOUND
+            )
+        except ValidationError:
+            return (
+                {
+                    "message": "validation error"
+                }
+            )
+        except Exception as e:
+            logging.error(e)
+            return Response(
+                {
+                    "message": "Error Occurred",
+                    "error": str(e)
+                }
             )

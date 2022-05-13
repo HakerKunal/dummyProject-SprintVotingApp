@@ -1,5 +1,5 @@
 from .utils import InsertionError
-
+from user.models import User
 from django.db import models
 
 
@@ -19,3 +19,10 @@ class Sprint(models.Model):
 
 class Parameter(models.Model):
     parameter_name = models.CharField(max_length=35, unique=True)
+
+
+class Votes(models.Model):
+    sprint_id = models.ForeignKey(Sprint, on_delete=models.CASCADE)
+    parameter_id = models.ForeignKey(Parameter, on_delete=models.CASCADE)
+    vote_by = models.ForeignKey(User, related_name="vote_by", on_delete=models.CASCADE)
+    vote_to = models.ForeignKey(User, related_name="vote_to", on_delete=models.CASCADE)
