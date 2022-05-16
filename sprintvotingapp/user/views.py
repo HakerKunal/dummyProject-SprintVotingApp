@@ -63,7 +63,7 @@ class Login(APIView):
                     {
                         "message": "Login Unsuccessful!!! Please Verify yourself by clicking on the link sent to you"
                     },
-                    status=status.HTTP_200_OK)
+                    status=status.HTTP_401_UNAUTHORIZED)
             token = EncodeDecodeToken.encode_token(payload=user.id)
 
             return Response(
