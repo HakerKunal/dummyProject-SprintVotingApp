@@ -1,5 +1,5 @@
 from rest_framework.response import Response
-
+from django.http import QueryDict
 from user.utils import EncodeDecodeToken
 
 
@@ -23,6 +23,8 @@ def verify_token(function):
             return response
         token = request.META['HTTP_AUTHORIZATION']
         user_id = EncodeDecodeToken.decode_token(token)
+        if isinstance(request.data, QueryDict):
+            request.data._mutable = True
         request.data.update({'user_id': user_id.get("user_id")})
         if id is None:
             return function(self, request)
