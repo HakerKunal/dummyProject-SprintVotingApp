@@ -1,11 +1,12 @@
 import logging
+from django.db import transaction
 from .models import Sprint, Parameter, Votes
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializer import SprintSerializer, ParamSerializer, VoteSerializer
 from rest_framework.exceptions import ValidationError
-from .utils import InsertionError, verify_token
+from .utils import InsertionError, AlreadyPresentException, verify_token
 
 logging.basicConfig(filename="sprint.log", filemode="w")
 
@@ -269,47 +270,60 @@ class VoteParameter(APIView):
 
 
 class Voting(APIView):
+    @transaction.atomic
     @verify_token
     def post(self, request, id):
         try:
-
-            request.data.update({"sprint_id": id})
-            request.data.update({"vote_by": request.data.get("user_id")})
-            vote = Votes.objects.filter(vote_by=request.data.get('vote_by'),
-                                        parameter_id=request.data.get('parameter_id'), sprint_id=id)
-            print(vote)
+            parameter_list = request.data.get("parameter_list")
             if not Sprint.objects.filter(id=id, is_active=True):
                 return Response(
                     {
                         "message": "this Sprint is not active"
                     }, status=status.HTTP_400_BAD_REQUEST
                 )
+            with transaction.atomic():
+                for parameter in parameter_list:
+                    parameter.update({"sprint_id": id})
+                    parameter.update({"vote_by": request.data.get("user_id")})
 
-            if request.data.get("vote_by") == request.data.get("vote_to"):
-                return Response(
-                    {
-                        "message": "You cannot Vote for yourself"
-                    }, status=status.HTTP_400_BAD_REQUEST
-                )
-            elif vote:
-                return Response(
-                    {
-                        "message": "You have already voted on this parameter"
-                    }, status=status.HTTP_100_CONTINUE
-                )
+                    vote = Votes.objects.filter(vote_by=request.data.get("user_id"),
+                                                parameter_id=parameter.get("parameter_id"),
+                                                sprint_id=id)
 
-            serializer = VoteSerializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
+                    if parameter.get("vote_by") == parameter.get("vote_to"):
+                        raise InsertionError
+
+
+                    elif vote:
+                        raise AlreadyPresentException
+
+                    serializer = VoteSerializer(data=parameter)
+                    serializer.is_valid(raise_exception=True)
+                    serializer.save()
 
             return Response(
                 {
                     "message": "Voting Successful"
                 }, status=status.HTTP_201_CREATED
             )
+        except InsertionError:
+            return Response(
+                {
+                    "message": "You cannot Vote for yourself",
+                    "data": parameter
+                }, status=status.HTTP_400_BAD_REQUEST
+            )
 
+        except AlreadyPresentException:
+            return Response(
+                {
+                    "message": "Parameter addition Unsuccessful-already voted on this parameter",
+                    "data": parameter
+                }, status=status.HTTP_400_BAD_REQUEST
+            )
         except Exception as e:
             logging.error(e)
+
             return Response(
                 {
                     "message": "Exception Occurred",
@@ -374,34 +388,44 @@ class Voting(APIView):
         :return: Response
         """
         try:
-            request.data.update({"sprint_id": id})
-            request.data.update({"vote_by": request.data.get("user_id")})
 
-            vote = Votes.objects.filter(vote_by=request.data.get("vote_by"),
-                                        sprint_id=request.data.get("sprint_id"),
-                                        parameter_id=request.data.get("parameter_id")).first()
-            if vote:
-                if request.data.get("vote_by") == request.data.get("vote_to"):
-                    return Response(
-                        {
-                            "message": "You cannot Vote for yourself"
-                        }, status=status.HTTP_400_BAD_REQUEST
-                    )
-
-                serializer = VoteSerializer(vote, data=request.data)
-                serializer.is_valid(raise_exception=True)
-                serializer.save()
+            parameter_list = request.data.get("parameter_list")
+            if not Sprint.objects.filter(id=id, is_active=True):
                 return Response(
                     {
-                        "message": "Your vote is updated",
-                        "data": serializer.data
-                    }, status=status.HTTP_200_OK
+                        "message": "this Sprint is not active"
+                    }, status=status.HTTP_400_BAD_REQUEST
                 )
-
+            for parameter in parameter_list:
+                parameter.update({"sprint_id": id})
+                parameter.update({"vote_by": request.data.get("user_id")})
+                votes_obj = Votes.objects.filter(
+                    vote_by=parameter.get("vote_by"),
+                    parameter_id=parameter.get("parameter_id"),
+                    sprint_id=parameter.get("sprint_id")
+                ).first()
+                if parameter.get("vote_by") == parameter.get("vote_for"):
+                    return Response(
+                        {
+                            "Message": "You Can not update your self parameter",
+                        },
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+                else:
+                    if votes_obj is None:
+                        serializer = VoteSerializer(instance=votes_obj, data=parameter)
+                        serializer.is_valid(raise_exception=True)
+                        serializer.save()
+                    else:
+                        votes_obj.delete()
+                        serializer = VoteSerializer(data=parameter)
+                        serializer.is_valid(raise_exception=True)
+                        serializer.save()
             return Response(
                 {
-                    "message": "no such vote found"
-                }, status=status.HTTP_404_NOT_FOUND
+                    "message": "Your vote is updated",
+
+                }, status=status.HTTP_200_OK
             )
         except ValidationError as e:
             return Response(
