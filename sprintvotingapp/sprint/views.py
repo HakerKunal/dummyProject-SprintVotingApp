@@ -22,18 +22,25 @@ class SprintC(APIView):
             serializer = SprintSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
-            return Response({"message": "Sprint Added Successfully",
-                             "data": serializer.data},
-                            status=status.HTTP_201_CREATED)
+            return Response(
+                {
+                    "message": "Sprint Added Successfully",
+                    "data": serializer.data
+                }, status=status.HTTP_201_CREATED
+            )
         except InsertionError as e:
-            return Response({"message": "Error Occurred",
-                             "error": str(e)},
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {
+                    "message": "Error Occurred",
+                    "error": str(e)
+                }, status=status.HTTP_400_BAD_REQUEST
+            )
         except Exception as e:
-            return Response({"message": "Error Occurred",
-                             "error": str(e)},
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                            )
+            return Response(
+                {"message": "Error Occurred",
+                 "error": str(e)
+                 }, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
     @verify_token
     def put(self, request, id):
@@ -48,10 +55,12 @@ class SprintC(APIView):
             serializer.is_valid(raise_exception=True)
             serializer.save()
 
-            return Response({
-                "message": "Sprint updated successfully",
-                "data": serializer.data
-            }, status=status.HTTP_200_OK)
+            return Response(
+                {
+                    "message": "Sprint updated successfully",
+                    "data": serializer.data
+                }, status=status.HTTP_200_OK
+            )
         except ValidationError:
             logging.error("Validation failed")
             return Response(
@@ -61,10 +70,12 @@ class SprintC(APIView):
                 status=status.HTTP_400_BAD_REQUEST)
 
         except Exception as e:
-            return Response({
-                "message": "Error Occurred",
-                "error": str(e)
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR, )
+            return Response(
+                {
+                    "message": "Error Occurred",
+                    "error": str(e)
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
     @verify_token
     def get(self, request):
@@ -77,17 +88,25 @@ class SprintC(APIView):
             sprint = Sprint.objects.filter(is_active=True)
             serializer = SprintSerializer(sprint, many=True)
             if sprint:
-                return Response({
-                    "message": "Your active sprints are:",
-                    "data": serializer.data
-                })
-            return Response({
-                "message": "No active sprint",
-
-            })
+                return Response(
+                    {
+                        "message": "Your active sprints are:",
+                        "data": serializer.data
+                    }, status=status.HTTP_200_OK
+                )
+            return Response(
+                {
+                    "message": "No active sprint",
+                }, status=status.HTTP_404_NOT_FOUND
+            )
 
         except Exception as e:
-            return Response({"message": str(e), })
+            return Response(
+                {
+                    "message": "Error Occurred",
+                    "error": str(e)
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
     @verify_token
     def delete(self, request, id):
@@ -201,13 +220,13 @@ class VoteParameter(APIView):
                 {
                     "message": "Parameter updation  successful",
                     "data": serializer.data
-                }
+                }, status=status.HTTP_200_OK
             )
         except ValidationError:
             return Response(
                 {
                     "message": "Validation error"
-                }
+                }, status=status.HTTP_400_BAD_REQUEST
             )
         except Exception as e:
             logging.error(e)
@@ -215,7 +234,7 @@ class VoteParameter(APIView):
                 {
                     "message": "Error Occurred",
                     "error": str(e)
-                }
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
     @verify_token
@@ -237,7 +256,7 @@ class VoteParameter(APIView):
             return Response(
                 {
                     "message": "Validation error"
-                }
+                }, status=status.HTTP_400_BAD_REQUEST
             )
         except Exception as e:
             logging.error("Exception Occurred")
@@ -263,20 +282,20 @@ class Voting(APIView):
                 return Response(
                     {
                         "message": "this Sprint is not active"
-                    }
+                    }, status=status.HTTP_400_BAD_REQUEST
                 )
 
             if request.data.get("vote_by") == request.data.get("vote_to"):
                 return Response(
                     {
                         "message": "You cannot Vote for yourself"
-                    }
+                    }, status=status.HTTP_400_BAD_REQUEST
                 )
             elif vote:
                 return Response(
                     {
                         "message": "You have already voted on this parameter"
-                    }
+                    }, status=status.HTTP_100_CONTINUE
                 )
 
             serializer = VoteSerializer(data=request.data)
@@ -332,10 +351,10 @@ class Voting(APIView):
                 }, status=status.HTTP_404_NOT_FOUND
             )
         except ValidationError:
-            return (
+            return Response(
                 {
                     "message": "validation error"
-                }
+                }, status=status.HTTP_400_BAD_REQUEST
             )
         except Exception as e:
             logging.error(e)
@@ -343,5 +362,58 @@ class Voting(APIView):
                 {
                     "message": "Error Occurred",
                     "error": str(e)
-                }
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+    @verify_token
+    def put(self, request, id):
+        """
+        For updating the existing votes
+        :param request:
+        :param id: Id of the sprint
+        :return: Response
+        """
+        try:
+            request.data.update({"sprint_id": id})
+            request.data.update({"vote_by": request.data.get("user_id")})
+
+            vote = Votes.objects.filter(vote_by=request.data.get("vote_by"),
+                                        sprint_id=request.data.get("sprint_id"),
+                                        parameter_id=request.data.get("parameter_id")).first()
+            if vote:
+                if request.data.get("vote_by") == request.data.get("vote_to"):
+                    return Response(
+                        {
+                            "message": "You cannot Vote for yourself"
+                        }, status=status.HTTP_400_BAD_REQUEST
+                    )
+
+                serializer = VoteSerializer(vote, data=request.data)
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+                return Response(
+                    {
+                        "message": "Your vote is updated",
+                        "data": serializer.data
+                    }, status=status.HTTP_200_OK
+                )
+
+            return Response(
+                {
+                    "message": "no such vote found"
+                }, status=status.HTTP_404_NOT_FOUND
+            )
+        except ValidationError as e:
+            return Response(
+                {
+                    "message": "Validation error!!!!!!!!",
+                    "error": str(e)
+                }, status=status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            return Response(
+                {
+                    "message": "Error Occurred..",
+                    "error": str(e)
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
