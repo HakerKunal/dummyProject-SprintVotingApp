@@ -25,4 +25,4 @@ class Votes(models.Model):
     sprint_id = models.ForeignKey(Sprint, on_delete=models.CASCADE)
     parameter_id = models.ForeignKey(Parameter, on_delete=models.CASCADE)
     vote_by = models.ForeignKey(User, related_name="vote_by", on_delete=models.CASCADE)
-    vote_to = models.ForeignKey(User, related_name="vote_to", on_delete=models.CASCADE)
+    vote_to = models.ForeignKey(User, related_name="vote_to", on_delete=models.CASCADE,null=True)

@@ -7,6 +7,8 @@ class InsertionError(Exception):
     """ my custom exception class """
 
 
+class AlreadyPresentException(Exception):
+    """ my custom exception class """
 def verify_token(function):
     """
     For verifying user
