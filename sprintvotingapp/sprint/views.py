@@ -1,4 +1,7 @@
 import logging
+from collections import Counter
+from itertools import count
+
 from django.db import transaction
 from .models import Sprint, Parameter, Votes
 from rest_framework import status
@@ -7,6 +10,7 @@ from rest_framework.views import APIView
 from .serializer import SprintSerializer, ParamSerializer, VoteSerializer
 from rest_framework.exceptions import ValidationError
 from .utils import InsertionError, AlreadyPresentException, verify_token
+from user.models import User
 
 logging.basicConfig(filename="sprint.log", filemode="w")
 
@@ -440,4 +444,43 @@ class Voting(APIView):
                     "message": "Error Occurred..",
                     "error": str(e)
                 }, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class Result(APIView):
+    """
+    For Retreving the result of voting held
+    """
+
+    def get(self, request, id):
+        """
+        For getting the result
+        :param request:
+        :param id: id of sprint
+        :return: Response
+        """
+        try:
+            votes = Votes.objects.filter(sprint_id=id)
+            serializer = VoteSerializer(votes, many=True)
+            list_of_votes = list()
+            for vote_dic in serializer.data:
+                vote_to = User.objects.get(id=vote_dic["vote_to"])
+
+                list_of_votes.append(vote_to.username)
+            vote_count = Counter(list_of_votes)
+            winner = max(list_of_votes, key=list_of_votes.count)
+
+            return Response(
+                {
+                    "winner": winner,
+                    "vote Count": vote_count,
+                    "vote details": serializer.data
+                },
+                status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(
+                {
+                    "message": "Errror Occurred",
+                    "error": str(e)
+                }, status=status.HTTP_400_BAD_REQUEST
             )
