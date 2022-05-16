@@ -1,7 +1,6 @@
 import logging
 from collections import Counter
 from itertools import count
-
 from django.db import transaction
 from .models import Sprint, Parameter, Votes
 from rest_framework import status
@@ -159,8 +158,9 @@ class VoteParameter(APIView):
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response({
-                "message": "Parameter Added Successful"
-                           ""},
+                "message": "Parameter Added Successful",
+                "data":serializer.data
+                           },
                 status=status.HTTP_201_CREATED)
         except ValidationError:
             logging.error("Validation failed")
@@ -408,7 +408,7 @@ class Voting(APIView):
                     parameter_id=parameter.get("parameter_id"),
                     sprint_id=parameter.get("sprint_id")
                 ).first()
-                if parameter.get("vote_by") == parameter.get("vote_for"):
+                if parameter.get("vote_by") == parameter.get("vote_to"):
                     return Response(
                         {
                             "Message": "You Can not update your self parameter",
