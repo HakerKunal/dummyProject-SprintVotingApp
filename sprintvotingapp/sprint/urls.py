@@ -8,5 +8,6 @@ urlpatterns = [
     path('param', views.VoteParameter.as_view(), name='add-parameter'),
     path('param/<int:id>', views.VoteParameter.as_view(), name='update-parameter'),
     path('sprint/<int:id>/vote', views.Voting.as_view(), name='user-votes'),
+    path('sprint/<int:id>/result', views.Result.as_view(), name='result'),
 
 ]
