@@ -968,4 +968,3 @@ class TestSprint:
         url = reverse("result", kwargs={'id': 2})
         response = client.get(url, **header, content_type='application/json')
         assert response.status_code == 400
-
