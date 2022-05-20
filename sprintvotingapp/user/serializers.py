@@ -15,13 +15,11 @@ class UserSerializer(serializers.Serializer):
     is_verified = serializers.BooleanField(default=False)
 
     def create(self, validated_data):
-        """
-        Create and return a new `Snippet` instance, given the validated data.
-        """
         return User.objects.create_user(**validated_data)
 
-    def create_super(self, validated_data):
-        return User.objects.create_superuser(**validated_data)
+
+
+
 
     def update(self, instance, validated_data):
         """
