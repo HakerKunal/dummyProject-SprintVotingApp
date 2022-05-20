@@ -9,6 +9,8 @@ class InsertionError(Exception):
 
 class AlreadyPresentException(Exception):
     """ my custom exception class """
+
+
 def verify_token(function):
     """
     For verifying user
@@ -23,6 +25,7 @@ def verify_token(function):
             return response
         token = request.META['HTTP_AUTHORIZATION']
         user_id = EncodeDecodeToken.decode_token(token)
+
         if isinstance(request.data, QueryDict):
             request.data._mutable = True
         request.data.update({'user_id': user_id.get("user_id")})

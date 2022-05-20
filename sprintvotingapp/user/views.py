@@ -19,10 +19,10 @@ class Registration(APIView):
         :return:Response
         """
         try:
-
             serializer = UserSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
-            user = serializer.create(validated_data=serializer.data)
+            user = serializer.create(validated_data=request.data)
+
             token = EncodeDecodeToken.encode_token(user.id)
             EmailService.send_mail_for_verification(name=user, to=user.email, token=token)
 

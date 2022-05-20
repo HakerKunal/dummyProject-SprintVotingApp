@@ -23,14 +23,23 @@ class SprintC(APIView):
         :return:Response
         """
         try:
-            serializer = SprintSerializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
+            user = User.objects.get(id=request.data.get("user_id"))
+
+            if user.is_superuser:
+                serializer = SprintSerializer(data=request.data)
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+                return Response(
+                    {
+                        "message": "Sprint Added Successfully",
+                        "data": serializer.data
+                    }, status=status.HTTP_201_CREATED
+                )
             return Response(
                 {
-                    "message": "Sprint Added Successfully",
-                    "data": serializer.data
-                }, status=status.HTTP_201_CREATED
+                    "message": "Only admin or superuser can add a sprint"
+
+                }, status=status.HTTP_401_UNAUTHORIZED
             )
         except InsertionError as e:
             return Response(
@@ -54,16 +63,24 @@ class SprintC(APIView):
         :return:
         """
         try:
-            sprint = Sprint.objects.get(id=id)
-            serializer = SprintSerializer(sprint, data=request.data)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
+            user = User.objects.get(id=request.data.get("user_id"))
+            if user.is_superuser:
+                sprint = Sprint.objects.get(id=id)
+                serializer = SprintSerializer(sprint, data=request.data)
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
 
+                return Response(
+                    {
+                        "message": "Sprint updated successfully",
+                        "data": serializer.data
+                    }, status=status.HTTP_200_OK
+                )
             return Response(
                 {
-                    "message": "Sprint updated successfully",
-                    "data": serializer.data
-                }, status=status.HTTP_200_OK
+                    "message": "Only admin or superuser can update a sprint"
+
+                }, status=status.HTTP_401_UNAUTHORIZED
             )
         except ValidationError:
             logging.error("Validation failed")
@@ -89,6 +106,7 @@ class SprintC(APIView):
              :return: Response
         """
         try:
+
             sprint = Sprint.objects.filter(is_active=True)
             serializer = SprintSerializer(sprint, many=True)
             if sprint:
@@ -121,13 +139,21 @@ class SprintC(APIView):
         :return: Response
         """
         try:
-            sprint = Sprint.objects.get(id=id)
-            sprint.delete()
+            user = User.objects.get(id=request.data.get("user_id"))
+            if user.is_superuser:
+                sprint = Sprint.objects.get(id=id)
+                sprint.delete()
+                return Response(
+                    {
+                        "message": "Sprint deleted successfully"
+                    },
+                    status=status.HTTP_200_OK)
             return Response(
                 {
-                    "message": "Sprint deleted successfully"
-                },
-                status=status.HTTP_200_OK)
+                    "message": "Only admin or superuser can delete a sprint"
+
+                }, status=status.HTTP_401_UNAUTHORIZED
+            )
         except ValidationError:
             logging.error("Validation failed")
             return Response(
@@ -154,14 +180,22 @@ class VoteParameter(APIView):
         :return: Response
         """
         try:
-            serializer = ParamSerializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response({
-                "message": "Parameter Added Successful",
-                "data":serializer.data
-                           },
-                status=status.HTTP_201_CREATED)
+            user = User.objects.get(id=request.data.get("user_id"))
+            if user.is_superuser:
+                serializer = ParamSerializer(data=request.data)
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+                return Response({
+                    "message": "Parameter Added Successful",
+                    "data": serializer.data
+                },
+                    status=status.HTTP_201_CREATED)
+            return Response(
+                {
+                    "message": "Only admin or superuser can add  parameter"
+
+                }, status=status.HTTP_401_UNAUTHORIZED
+            )
         except ValidationError:
             logging.error("Validation failed")
             return Response(
@@ -217,15 +251,23 @@ class VoteParameter(APIView):
         :return:
         """
         try:
-            parameter = Parameter.objects.get(id=id)
-            serializer = ParamSerializer(parameter, data=request.data)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
+            user = User.objects.get(id=request.data.get("user_id"))
+            if user.is_superuser:
+                parameter = Parameter.objects.get(id=id)
+                serializer = ParamSerializer(parameter, data=request.data)
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+                return Response(
+                    {
+                        "message": "Parameter updation  successful",
+                        "data": serializer.data
+                    }, status=status.HTTP_200_OK
+                )
             return Response(
                 {
-                    "message": "Parameter updation  successful",
-                    "data": serializer.data
-                }, status=status.HTTP_200_OK
+                    "message": "Only admin or superuser can update parameter"
+
+                }, status=status.HTTP_401_UNAUTHORIZED
             )
         except ValidationError:
             return Response(
@@ -250,12 +292,20 @@ class VoteParameter(APIView):
         :return: Response
         """
         try:
-            parameter = Parameter.objects.get(id=id)
-            parameter.delete()
+            user = User.objects.get(id=request.data.get("user_id"))
+            if user.is_superuser:
+                parameter = Parameter.objects.get(id=id)
+                parameter.delete()
+                return Response(
+                    {
+                        "message": "Deletion Successful"
+                    }, status=status.HTTP_200_OK
+                )
             return Response(
                 {
-                    "message": "Deletion Successful"
-                }, status=status.HTTP_200_OK
+                    "message": "Only admin or superuser can delete parameter"
+
+                }, status=status.HTTP_401_UNAUTHORIZED
             )
         except ValidationError:
             return Response(
