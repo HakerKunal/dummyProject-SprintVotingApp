@@ -8,14 +8,16 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializer import SprintSerializer, ParamSerializer, VoteSerializer
 from rest_framework.exceptions import ValidationError
-from .utils import InsertionError, AlreadyPresentException, verify_token
+from .utils import InsertionError, AlreadyPresentException, verify_token, is_superuser
 from user.models import User
 
 logging.basicConfig(filename="sprint.log", filemode="w")
 
 
 class SprintC(APIView):
+
     @verify_token
+    @is_superuser
     def post(self, request):
         """
         For Adding sprint Cycle
@@ -23,24 +25,16 @@ class SprintC(APIView):
         :return:Response
         """
         try:
-            user = User.objects.get(id=request.data.get("user_id"))
-
-            if user.is_superuser:
-                serializer = SprintSerializer(data=request.data)
-                serializer.is_valid(raise_exception=True)
-                serializer.save()
-                return Response(
-                    {
-                        "message": "Sprint Added Successfully",
-                        "data": serializer.data
-                    }, status=status.HTTP_201_CREATED
-                )
+            serializer = SprintSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
             return Response(
                 {
-                    "message": "Only admin or superuser can add a sprint"
+                    "message": "Sprint Added Successfully",
+                    "data": serializer.data
+                }, status=status.HTTP_201_CREATED)
 
-                }, status=status.HTTP_401_UNAUTHORIZED
-            )
+
         except InsertionError as e:
             return Response(
                 {
@@ -56,6 +50,7 @@ class SprintC(APIView):
             )
 
     @verify_token
+    @is_superuser
     def put(self, request, id):
         """
         For Updating the Sprint Cycle
@@ -63,25 +58,26 @@ class SprintC(APIView):
         :return:
         """
         try:
-            user = User.objects.get(id=request.data.get("user_id"))
-            if user.is_superuser:
-                sprint = Sprint.objects.get(id=id)
-                serializer = SprintSerializer(sprint, data=request.data)
-                serializer.is_valid(raise_exception=True)
-                serializer.save()
 
+            if not Sprint.objects.filter(id=id):
                 return Response(
                     {
-                        "message": "Sprint updated successfully",
-                        "data": serializer.data
-                    }, status=status.HTTP_200_OK
+                        "message": "Sprint Does Not Exist"
+                    }, status=status.HTTP_404_NOT_FOUND
                 )
+
+            sprint = Sprint.objects.get(id=id)
+            serializer = SprintSerializer(sprint, data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+
             return Response(
                 {
-                    "message": "Only admin or superuser can update a sprint"
-
-                }, status=status.HTTP_401_UNAUTHORIZED
+                    "message": "Sprint updated successfully",
+                    "data": serializer.data
+                }, status=status.HTTP_200_OK
             )
+
         except ValidationError:
             logging.error("Validation failed")
             return Response(
@@ -99,6 +95,7 @@ class SprintC(APIView):
             )
 
     @verify_token
+    @is_superuser
     def get(self, request):
         """
              this method is created for retrieve data
@@ -131,6 +128,7 @@ class SprintC(APIView):
             )
 
     @verify_token
+    @is_superuser
     def delete(self, request, id):
         """
         This method is created for delete the existing data
@@ -139,21 +137,21 @@ class SprintC(APIView):
         :return: Response
         """
         try:
-            user = User.objects.get(id=request.data.get("user_id"))
-            if user.is_superuser:
-                sprint = Sprint.objects.get(id=id)
-                sprint.delete()
+
+            if not Sprint.objects.filter(id=id):
                 return Response(
                     {
-                        "message": "Sprint deleted successfully"
-                    },
-                    status=status.HTTP_200_OK)
+                        "message": "Sprint Does Not Exist"
+                    }, status=status.HTTP_404_NOT_FOUND
+                )
+            sprint = Sprint.objects.get(id=id)
+            sprint.delete()
             return Response(
                 {
-                    "message": "Only admin or superuser can delete a sprint"
+                    "message": "Sprint deleted successfully"
+                },
+                status=status.HTTP_200_OK)
 
-                }, status=status.HTTP_401_UNAUTHORIZED
-            )
         except ValidationError:
             logging.error("Validation failed")
             return Response(
@@ -165,7 +163,7 @@ class SprintC(APIView):
             logging.error(e)
             return Response(
                 {
-                    "message": "no such sprint found",
+                    "message": "Exception Occurred",
                 },
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
@@ -173,6 +171,7 @@ class SprintC(APIView):
 
 class VoteParameter(APIView):
     @verify_token
+    @is_superuser
     def post(self, request):
         """
         For Adding Parameter for voting
@@ -180,22 +179,16 @@ class VoteParameter(APIView):
         :return: Response
         """
         try:
-            user = User.objects.get(id=request.data.get("user_id"))
-            if user.is_superuser:
-                serializer = ParamSerializer(data=request.data)
-                serializer.is_valid(raise_exception=True)
-                serializer.save()
-                return Response({
-                    "message": "Parameter Added Successful",
-                    "data": serializer.data
-                },
-                    status=status.HTTP_201_CREATED)
-            return Response(
-                {
-                    "message": "Only admin or superuser can add  parameter"
 
-                }, status=status.HTTP_401_UNAUTHORIZED
-            )
+            serializer = ParamSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response({
+                "message": "Parameter Added Successful",
+                "data": serializer.data
+            },
+                status=status.HTTP_201_CREATED)
+
         except ValidationError:
             logging.error("Validation failed")
             return Response(
@@ -211,6 +204,7 @@ class VoteParameter(APIView):
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @verify_token
+    @is_superuser
     def get(self, request):
         """
         For Getting the list of all the parameter
@@ -243,6 +237,7 @@ class VoteParameter(APIView):
                 status=status.HTTP_400_BAD_REQUEST)
 
     @verify_token
+    @is_superuser
     def put(self, request, id):
         """
         USed for updating existing Parameter
@@ -251,24 +246,23 @@ class VoteParameter(APIView):
         :return:
         """
         try:
-            user = User.objects.get(id=request.data.get("user_id"))
-            if user.is_superuser:
-                parameter = Parameter.objects.get(id=id)
-                serializer = ParamSerializer(parameter, data=request.data)
-                serializer.is_valid(raise_exception=True)
-                serializer.save()
+            if not Parameter.objects.filter(id=id):
                 return Response(
                     {
-                        "message": "Parameter updation  successful",
-                        "data": serializer.data
-                    }, status=status.HTTP_200_OK
+                        "message": "Parameter Does Not Exist"
+                    }, status=status.HTTP_404_NOT_FOUND
                 )
+            parameter = Parameter.objects.get(id=id)
+            serializer = ParamSerializer(parameter, data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
             return Response(
                 {
-                    "message": "Only admin or superuser can update parameter"
-
-                }, status=status.HTTP_401_UNAUTHORIZED
+                    "message": "Parameter updation  successful",
+                    "data": serializer.data
+                }, status=status.HTTP_200_OK
             )
+
         except ValidationError:
             return Response(
                 {
@@ -285,6 +279,7 @@ class VoteParameter(APIView):
             )
 
     @verify_token
+    @is_superuser
     def delete(self, request, id):
         """
         For Delete The Existing Parameter
@@ -292,21 +287,20 @@ class VoteParameter(APIView):
         :return: Response
         """
         try:
-            user = User.objects.get(id=request.data.get("user_id"))
-            if user.is_superuser:
-                parameter = Parameter.objects.get(id=id)
-                parameter.delete()
+            if not Parameter.objects.filter(id=id):
                 return Response(
                     {
-                        "message": "Deletion Successful"
-                    }, status=status.HTTP_200_OK
+                        "message": "Parameter Does Not Exist"
+                    }, status=status.HTTP_404_NOT_FOUND
                 )
+            parameter = Parameter.objects.get(id=id)
+            parameter.delete()
             return Response(
                 {
-                    "message": "Only admin or superuser can delete parameter"
-
-                }, status=status.HTTP_401_UNAUTHORIZED
+                    "message": "Deletion Successful"
+                }, status=status.HTTP_200_OK
             )
+
         except ValidationError:
             return Response(
                 {
@@ -501,7 +495,7 @@ class Result(APIView):
     """
     For Retreving the result of voting held
     """
-
+    @verify_token
     def get(self, request, id):
         """
         For getting the result
@@ -510,6 +504,12 @@ class Result(APIView):
         :return: Response
         """
         try:
+            if not Sprint.objects.filter(id=id):
+                return Response(
+                    {
+                        "message": "Sprint Doesn't Exists"
+                    },status=status.HTTP_404_NOT_FOUND
+                )
             votes = Votes.objects.filter(sprint_id=id)
             serializer = VoteSerializer(votes, many=True)
             list_of_votes = list()
