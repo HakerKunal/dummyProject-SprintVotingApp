@@ -15,7 +15,8 @@ class TestSprint:
                 "email": "kunalbatham15@gmail.com",
                 "first_name": "usera",
                 "last_name": "kumar",
-                "is_verified": "True"
+                "is_verified": "True",
+                "is_superuser": "True"
             },
             {
                 "username": "userb123",
@@ -23,7 +24,8 @@ class TestSprint:
                 "email": "kunalbatham15@gmail.com",
                 "first_name": "userb",
                 "last_name": "kumar",
-                "is_verified": "True"
+                "is_verified": "True",
+                "is_superuser": "True"
             }
 
         ]
@@ -31,7 +33,8 @@ class TestSprint:
         for users in list_of_user:
             user = User.objects.create_user(username=users.get("username"), password=users.get("password"),
                                             email=users.get("email"), first_name=users.get("first_name"),
-                                            last_name=users.get("last_name"), is_verified=users.get("is_verified"))
+                                            last_name=users.get("last_name"), is_verified=users.get("is_verified"),
+                                            is_superuser=users.get("is_superuser"))
             user.save()
             data = {
                 "username": "usera123",
@@ -95,7 +98,8 @@ class TestSprint:
                 "email": "kunalbatham15@gmail.com",
                 "first_name": "usera",
                 "last_name": "kumar",
-                "is_verified": "True"
+                "is_verified": "True",
+                "is_superuser": "True"
             },
             {
                 "username": "userb123",
@@ -103,7 +107,8 @@ class TestSprint:
                 "email": "kunalbatham15@gmail.com",
                 "first_name": "userb",
                 "last_name": "kumar",
-                "is_verified": "True"
+                "is_verified": "True",
+                "is_superuser": "True"
             }
 
         ]
@@ -111,7 +116,8 @@ class TestSprint:
         for users in list_of_user:
             user = User.objects.create_user(username=users.get("username"), password=users.get("password"),
                                             email=users.get("email"), first_name=users.get("first_name"),
-                                            last_name=users.get("last_name"), is_verified=users.get("is_verified"))
+                                            last_name=users.get("last_name"), is_verified=users.get("is_verified"),
+                                            is_superuser=users.get("is_superuser"))
             user.save()
             data = {
                 "username": "usera123",
@@ -175,7 +181,8 @@ class TestSprint:
                 "email": "kunalbatham15@gmail.com",
                 "first_name": "usera",
                 "last_name": "kumar",
-                "is_verified": "True"
+                "is_verified": "True",
+                "is_superuser": "True"
             },
             {
                 "username": "userb123",
@@ -183,7 +190,8 @@ class TestSprint:
                 "email": "kunalbatham15@gmail.com",
                 "first_name": "userb",
                 "last_name": "kumar",
-                "is_verified": "True"
+                "is_verified": "True",
+                "is_superuser": "True"
             }
 
         ]
@@ -191,7 +199,8 @@ class TestSprint:
         for users in list_of_user:
             user = User.objects.create_user(username=users.get("username"), password=users.get("password"),
                                             email=users.get("email"), first_name=users.get("first_name"),
-                                            last_name=users.get("last_name"), is_verified=users.get("is_verified"))
+                                            last_name=users.get("last_name"), is_verified=users.get("is_verified"),
+                                            is_superuser=users.get("is_superuser"))
             user.save()
             data = {
                 "username": "usera123",
@@ -254,7 +263,8 @@ class TestSprint:
                 "email": "kunalbatham15@gmail.com",
                 "first_name": "usera",
                 "last_name": "kumar",
-                "is_verified": "True"
+                "is_verified": "True",
+                "is_superuser": "True"
             },
             {
                 "username": "userb123",
@@ -262,7 +272,8 @@ class TestSprint:
                 "email": "kunalbatham15@gmail.com",
                 "first_name": "userb",
                 "last_name": "kumar",
-                "is_verified": "True"
+                "is_verified": "True",
+                "is_superuser": "True"
             }
 
         ]
@@ -270,7 +281,8 @@ class TestSprint:
         for users in list_of_user:
             user = User.objects.create_user(username=users.get("username"), password=users.get("password"),
                                             email=users.get("email"), first_name=users.get("first_name"),
-                                            last_name=users.get("last_name"), is_verified=users.get("is_verified"))
+                                            last_name=users.get("last_name"), is_verified=users.get("is_verified"),
+                                            is_superuser=users.get("is_superuser"))
             user.save()
             data = {
                 "username": "usera123",
@@ -332,7 +344,8 @@ class TestSprint:
                 "email": "kunalbatham15@gmail.com",
                 "first_name": "usera",
                 "last_name": "kumar",
-                "is_verified": "True"
+                "is_verified": "True",
+                "is_superuser": "True"
             },
             {
                 "username": "userb123",
@@ -340,7 +353,8 @@ class TestSprint:
                 "email": "kunalbatham15@gmail.com",
                 "first_name": "userb",
                 "last_name": "kumar",
-                "is_verified": "True"
+                "is_verified": "True",
+                "is_superuser": "True"
             }
 
         ]
@@ -348,7 +362,8 @@ class TestSprint:
         for users in list_of_user:
             user = User.objects.create_user(username=users.get("username"), password=users.get("password"),
                                             email=users.get("email"), first_name=users.get("first_name"),
-                                            last_name=users.get("last_name"), is_verified=users.get("is_verified"))
+                                            last_name=users.get("last_name"), is_verified=users.get("is_verified"),
+                                            is_superuser=users.get("is_superuser"))
             user.save()
             data = {
                 "username": "usera123",
@@ -412,7 +427,8 @@ class TestSprint:
                 "email": "kunalbatham15@gmail.com",
                 "first_name": "usera",
                 "last_name": "kumar",
-                "is_verified": "True"
+                "is_verified": "True",
+                "is_superuser": "True"
             },
             {
                 "username": "userb123",
@@ -420,7 +436,8 @@ class TestSprint:
                 "email": "kunalbatham15@gmail.com",
                 "first_name": "userb",
                 "last_name": "kumar",
-                "is_verified": "True"
+                "is_verified": "True",
+                "is_superuser": "True"
             }
 
         ]
@@ -428,7 +445,8 @@ class TestSprint:
         for users in list_of_user:
             user = User.objects.create_user(username=users.get("username"), password=users.get("password"),
                                             email=users.get("email"), first_name=users.get("first_name"),
-                                            last_name=users.get("last_name"), is_verified=users.get("is_verified"))
+                                            last_name=users.get("last_name"), is_verified=users.get("is_verified"),
+                                            is_superuser=users.get("is_superuser"))
             user.save()
 
             data = {
@@ -492,7 +510,8 @@ class TestSprint:
                 "email": "kunalbatham15@gmail.com",
                 "first_name": "usera",
                 "last_name": "kumar",
-                "is_verified": "True"
+                "is_verified": "True",
+                "is_superuser": "True"
             },
             {
                 "username": "userb123",
@@ -500,7 +519,8 @@ class TestSprint:
                 "email": "kunalbatham15@gmail.com",
                 "first_name": "userb",
                 "last_name": "kumar",
-                "is_verified": "True"
+                "is_verified": "True",
+                "is_superuser": "True"
             },
             {
                 "username": "userc123",
@@ -508,7 +528,8 @@ class TestSprint:
                 "email": "kunalbatham15@gmail.com",
                 "first_name": "userc",
                 "last_name": "kumar",
-                "is_verified": "True"
+                "is_verified": "True",
+                "is_superuser": "True"
             }
 
         ]
@@ -516,7 +537,8 @@ class TestSprint:
         for users in list_of_user:
             user = User.objects.create_user(username=users.get("username"), password=users.get("password"),
                                             email=users.get("email"), first_name=users.get("first_name"),
-                                            last_name=users.get("last_name"), is_verified=users.get("is_verified"))
+                                            last_name=users.get("last_name"), is_verified=users.get("is_verified"),
+                                            is_superuser=users.get("is_superuser"))
             user.save()
 
             data = {
@@ -600,7 +622,8 @@ class TestSprint:
                 "email": "kunalbatham15@gmail.com",
                 "first_name": "usera",
                 "last_name": "kumar",
-                "is_verified": "True"
+                "is_verified": "True",
+                "is_superuser": "True"
             },
             {
                 "username": "userb123",
@@ -608,7 +631,8 @@ class TestSprint:
                 "email": "kunalbatham15@gmail.com",
                 "first_name": "userb",
                 "last_name": "kumar",
-                "is_verified": "True"
+                "is_verified": "True",
+                "is_superuser": "True"
             },
             {
                 "username": "userc123",
@@ -616,7 +640,8 @@ class TestSprint:
                 "email": "kunalbatham15@gmail.com",
                 "first_name": "userc",
                 "last_name": "kumar",
-                "is_verified": "True"
+                "is_verified": "True",
+                "is_superuser": "True"
             }
 
         ]
@@ -624,7 +649,8 @@ class TestSprint:
         for users in list_of_user:
             user = User.objects.create_user(username=users.get("username"), password=users.get("password"),
                                             email=users.get("email"), first_name=users.get("first_name"),
-                                            last_name=users.get("last_name"), is_verified=users.get("is_verified"))
+                                            last_name=users.get("last_name"), is_verified=users.get("is_verified"),
+                                            is_superuser=users.get("is_superuser"))
             user.save()
 
             data = {
@@ -709,7 +735,8 @@ class TestSprint:
                 "email": "kunalbatham15@gmail.com",
                 "first_name": "usera",
                 "last_name": "kumar",
-                "is_verified": "True"
+                "is_verified": "True",
+                "is_superuser": "True"
             },
             {
                 "username": "userb123",
@@ -717,7 +744,8 @@ class TestSprint:
                 "email": "kunalbatham15@gmail.com",
                 "first_name": "userb",
                 "last_name": "kumar",
-                "is_verified": "True"
+                "is_verified": "True",
+                "is_superuser": "True"
             },
             {
                 "username": "userc123",
@@ -725,7 +753,8 @@ class TestSprint:
                 "email": "kunalbatham15@gmail.com",
                 "first_name": "userc",
                 "last_name": "kumar",
-                "is_verified": "True"
+                "is_verified": "True",
+                "is_superuser": "True"
             }
 
         ]
@@ -733,7 +762,8 @@ class TestSprint:
         for users in list_of_user:
             user = User.objects.create_user(username=users.get("username"), password=users.get("password"),
                                             email=users.get("email"), first_name=users.get("first_name"),
-                                            last_name=users.get("last_name"), is_verified=users.get("is_verified"))
+                                            last_name=users.get("last_name"), is_verified=users.get("is_verified"),
+                                            is_superuser=users.get("is_superuser"))
             user.save()
 
             data = {
@@ -742,6 +772,7 @@ class TestSprint:
             }
             url = reverse("login")
             response = client.post(url, data)
+
             assert response.status_code == 200
         json_data = json.loads(response.content)
 
@@ -817,7 +848,8 @@ class TestSprint:
                 "email": "kunalbatham15@gmail.com",
                 "first_name": "usera",
                 "last_name": "kumar",
-                "is_verified": "True"
+                "is_verified": "True",
+                "is_superuser": "True"
             },
             {
                 "username": "userb123",
@@ -825,7 +857,8 @@ class TestSprint:
                 "email": "kunalbatham15@gmail.com",
                 "first_name": "userb",
                 "last_name": "kumar",
-                "is_verified": "True"
+                "is_verified": "True",
+                "is_superuser": "True"
             }
 
         ]
@@ -833,7 +866,8 @@ class TestSprint:
         for users in list_of_user:
             user = User.objects.create_user(username=users.get("username"), password=users.get("password"),
                                             email=users.get("email"), first_name=users.get("first_name"),
-                                            last_name=users.get("last_name"), is_verified=users.get("is_verified"))
+                                            last_name=users.get("last_name"), is_verified=users.get("is_verified"),
+                                            is_superuser=users.get("is_superuser"))
             user.save()
 
             data = {
@@ -897,7 +931,8 @@ class TestSprint:
                 "email": "kunalbatham15@gmail.com",
                 "first_name": "usera",
                 "last_name": "kumar",
-                "is_verified": "True"
+                "is_verified": "True",
+                "is_superuser": "True"
             },
             {
                 "username": "userb123",
@@ -905,7 +940,8 @@ class TestSprint:
                 "email": "kunalbatham15@gmail.com",
                 "first_name": "userb",
                 "last_name": "kumar",
-                "is_verified": "True"
+                "is_verified": "True",
+                "is_superuser": "True"
             }
 
         ]
@@ -913,7 +949,8 @@ class TestSprint:
         for users in list_of_user:
             user = User.objects.create_user(username=users.get("username"), password=users.get("password"),
                                             email=users.get("email"), first_name=users.get("first_name"),
-                                            last_name=users.get("last_name"), is_verified=users.get("is_verified"))
+                                            last_name=users.get("last_name"), is_verified=users.get("is_verified"),
+                                            is_superuser=users.get("is_superuser"))
             user.save()
 
             data = {
@@ -922,6 +959,7 @@ class TestSprint:
             }
             url = reverse("login")
             response = client.post(url, data)
+
             assert response.status_code == 200
         json_data = json.loads(response.content)
 
@@ -967,4 +1005,4 @@ class TestSprint:
         assert response.status_code == 201
         url = reverse("result", kwargs={'id': 2})
         response = client.get(url, **header, content_type='application/json')
-        assert response.status_code == 400
+        assert response.status_code == 404

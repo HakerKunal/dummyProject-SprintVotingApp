@@ -1,4 +1,4 @@
-import pytest
+import pytest, json
 from rest_framework.reverse import reverse
 from ..models import User
 
@@ -9,12 +9,14 @@ class TestUser:
         # test case create their own database to test the views
         url = reverse("registration")
         user = {
-            "username": "kuna123",
-            "password": "kuanl123",
+            "username": "kunal123",
+            "password": "kunal123",
             "email": "kunalbatham15@gmail.com",
             "first_name": "kunal",
             "last_name": "batham",
         }
+
+
         response = client.post(url, user)
 
         assert response.status_code == 201
@@ -30,7 +32,6 @@ class TestUser:
             "last_name": "batham",
         }
         response = client.post(url, user)
-
         assert response.status_code == 400
 
     def test_user_registration_blank_username(self, client):
@@ -39,10 +40,9 @@ class TestUser:
         user = {
             "username": "",
             "password": "root",
-            "email": "ssunanda02@gmail.com",
-            "mobile": "7578061886",
-            "first_name": "sunanda",
-            "last_name": "shil",
+            "email": "kunalbatham15@gmail.com",
+            "first_name": "kunal",
+            "last_name": "batham",
         }
         response = client.post(url, user)
         assert response.status_code == 400
@@ -63,7 +63,6 @@ class TestUser:
         url = reverse("login")
         response = client.post(url, data)
         assert response.status_code == 200
-
 
     def test_user_login_is_not_verified(self, client):
         user = User.objects.create_user(username="root123",
@@ -113,4 +112,3 @@ class TestUser:
         url = reverse("login")
         response = client.post(url, data)
         assert response.status_code == 404
-

@@ -13,6 +13,7 @@ class UserSerializer(serializers.Serializer):
     last_name = serializers.CharField(required=False)
     password = serializers.CharField(max_length=128, min_length=8, required=True, allow_null=False, allow_blank=False)
     is_verified = serializers.BooleanField(default=False)
+    is_superuser=serializers.BooleanField(required=False,default=False)
 
     def create(self, validated_data):
         return User.objects.create_user(**validated_data)
