@@ -21,8 +21,7 @@ class Registration(APIView):
         try:
             serializer = UserSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
-            user = serializer.create(validated_data=request.data)
-
+            user = serializer.create(validated_data=serializer.data)
             token = EncodeDecodeToken.encode_token(user.id)
             EmailService.send_mail_for_verification(name=user, to=user.email, token=token)
 
