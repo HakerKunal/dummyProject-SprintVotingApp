@@ -7,12 +7,12 @@ class UserSerializer(serializers.Serializer):
     User Serializer request and create new user
     """
     id = serializers.IntegerField(required=False)
-    username = serializers.RegexField("^(?=.{6,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$")
+    username = serializers.CharField(required=True)
     email = serializers.EmailField()
     first_name = serializers.CharField(required=False)
     last_name = serializers.CharField(required=False)
     password = serializers.CharField(max_length=128, min_length=8, required=True, allow_null=False, allow_blank=False)
-    is_verified = serializers.BooleanField(default=False)
+    is_verified = serializers.BooleanField(default=True)
     is_superuser=serializers.BooleanField(required=False,default=False)
 
     def create(self, validated_data):

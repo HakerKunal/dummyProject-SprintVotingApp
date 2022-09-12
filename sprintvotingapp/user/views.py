@@ -23,7 +23,8 @@ class Registration(APIView):
             serializer.is_valid(raise_exception=True)
             user = serializer.create(validated_data=serializer.data)
             token = EncodeDecodeToken.encode_token(user.id)
-            EmailService.send_mail_for_verification(name=user, to=user.email, token=token)
+            user.is_verified = True
+            # EmailService.send_mail_for_verification(name=user, to=user.email, token=token)
 
             return Response({"message": "User Registration Successful"}, status=status.HTTP_201_CREATED)
         except ValidationError as e:
@@ -68,7 +69,9 @@ class Login(APIView):
             return Response(
                 {
                     "message": "Login Successful",
-                    "token": token
+                    "token": token,
+                    "is_superuser": user.is_superuser,
+
                 },
                 status=status.HTTP_200_OK)
 

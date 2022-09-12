@@ -9,5 +9,6 @@ urlpatterns = [
     path('params/<int:id>', views.VoteParameter.as_view(), name='update-parameter'),
     path('sprints/<int:id>/votes', views.Voting.as_view(), name='user-votes'),
     path('sprints/<int:id>/results', views.Result.as_view(), name='result'),
+    path('sprintdata', views.SprintData.as_view(), name='sprintdata')
 
 ]

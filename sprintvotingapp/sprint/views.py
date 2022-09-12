@@ -1,3 +1,4 @@
+import json
 import logging
 from collections import Counter
 from itertools import count
@@ -95,7 +96,7 @@ class SprintC(APIView):
             )
 
     @verify_token
-    @is_superuser
+
     def get(self, request):
         """
              this method is created for retrieve data
@@ -103,6 +104,7 @@ class SprintC(APIView):
              :return: Response
         """
         try:
+
 
             sprint = Sprint.objects.filter(is_active=True)
             serializer = SprintSerializer(sprint, many=True)
@@ -204,7 +206,7 @@ class VoteParameter(APIView):
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @verify_token
-    @is_superuser
+
     def get(self, request):
         """
         For Getting the list of all the parameter
@@ -495,6 +497,7 @@ class Result(APIView):
     """
     For Retreving the result of voting held
     """
+
     @verify_token
     def get(self, request, id):
         """
@@ -508,23 +511,34 @@ class Result(APIView):
                 return Response(
                     {
                         "message": "Sprint Doesn't Exists"
-                    },status=status.HTTP_404_NOT_FOUND
+                    }, status=status.HTTP_404_NOT_FOUND
                 )
             votes = Votes.objects.filter(sprint_id=id)
             serializer = VoteSerializer(votes, many=True)
             list_of_votes = list()
+            vote_details = list()
             for vote_dic in serializer.data:
-                vote_to = User.objects.get(id=vote_dic["vote_to"])
+                if (vote_dic["vote_to"]) != None:
+                    vote_to = User.objects.get(id=vote_dic["vote_to"])
+                    parameter = Parameter.objects.get(id=vote_dic.get("parameter_id"))
+                    vote_by = User.objects.get(id=vote_dic.get("vote_by"))
+                    vote_obj = {"vote_to": vote_to.username, "vote_by": vote_by.username,
+                                "parameter_name": parameter.parameter_name}
+                    vote_details.append(vote_obj)
 
-                list_of_votes.append(vote_to.username)
+                    list_of_votes.append(vote_to.username)
             vote_count = Counter(list_of_votes)
+            dataPoints = list()
+            for vote in vote_count:
+                voteObj = {"label": vote, "y": vote_count[vote]}
+                dataPoints.append(voteObj)
             winner = max(list_of_votes, key=list_of_votes.count)
 
             return Response(
                 {
                     "winner": winner,
-                    "vote Count": vote_count,
-                    "vote details": serializer.data
+                    "vote_count": dataPoints,
+                    "vote_details": vote_details
                 },
                 status=status.HTTP_200_OK)
         except Exception as e:
@@ -533,4 +547,34 @@ class Result(APIView):
                     "message": "Errror Occurred",
                     "error": str(e)
                 }, status=status.HTTP_400_BAD_REQUEST
+            )
+
+
+class SprintData(APIView):
+
+    @verify_token
+    def get(self, request):
+        try:
+            users = User.objects.all()
+            list_of_username = list()
+            for user in users:
+                if request.data.get("user_id") != user.id:
+                    full_name = user.first_name + " " + user.last_name
+
+                    user_obj = {"name": full_name, "id": user.id}
+                    list_of_username.append(user_obj)
+
+            return Response(
+                {
+                    "message": "Got the data",
+                    "data": list_of_username
+
+                }
+            )
+        except Exception as e:
+            return Response(
+                {
+                    "message": "Exception Occurred",
+                    "error": str(e)
+                }
             )

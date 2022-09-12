@@ -10,6 +10,7 @@ class EncodeDecodeToken:
 
     @staticmethod
     def encode_token(payload):
+
         encoded_token = jwt.encode({"user_id": payload},
                                    "secret",
                                    algorithm="HS256"
